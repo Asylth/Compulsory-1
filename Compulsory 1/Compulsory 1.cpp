@@ -51,64 +51,13 @@ int main()
 //changes the game acording to the player inputs
 void playermove(char player1move, char player2move) {
 
-	switch (player1move) { //changes the value of the array at the possition the player requested for player 1
-	case '1':
-		tictacarray[0] = 'X';
-		break;
-	case '2':
-		tictacarray[1] = 'X';
-		break;
-	case '3':
-		tictacarray[2] = 'X';
-		break;
-	case '4':
-		tictacarray[3] = 'X';
-		break;
-	case '5':
-		tictacarray[4] = 'X';
-		break;
-	case '6':
-		tictacarray[5] = 'X';
-		break;
-	case '7':
-		tictacarray[6] = 'X';
-		break;
-	case '8':
-		tictacarray[7] = 'X';
-		break;
-	case '9':
-		tictacarray[8] = 'X';
-		break;
-	}
-
-	switch (player2move) { //changes the value of the array at the possition the player requested for player 1
-	case '1':
-		tictacarray[0] = 'O';
-		break;
-	case '2':
-		tictacarray[1] = 'O';
-		break;
-	case '3':
-		tictacarray[2] = 'O';
-		break;
-	case '4':
-		tictacarray[3] = 'O';
-		break;
-	case '5':
-		tictacarray[4] = 'O';
-		break;
-	case '6':
-		tictacarray[5] = 'O';
-		break;
-	case '7':
-		tictacarray[6] = 'O';
-		break;
-	case '8':
-		tictacarray[7] = 'O';
-		break;
-	case '9':
-		tictacarray[8] = 'O';
-		break;
+	for (int i = 0; i < sizeof(tictacarray); i++) {
+		if (tictacarray[i] == player1move) {
+			tictacarray[i] = 'X';
+		}
+		else if (tictacarray[i] == player2move) {
+			tictacarray[i] = 'O';
+		}
 	}
 }
 
