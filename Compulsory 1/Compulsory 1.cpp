@@ -1,63 +1,114 @@
 #include <iostream>
+#include <cstdlib> // for random
+#include <ctime> // for getting local time for seed value
 
 int wincheck(); //checks for victory conditoins
 void playermove(char, char); //makes the player moves happen
+void playerinput(); //takes player input
+void apeia(); //AI for singleplayer
+void printstatus(); //prints current state of the game
+bool ispossible(char, char); //checks wether a move is possible or not
 
-char tictacarray[9] = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
+//char tictacarray[2][9]{
+//	{'1', '2', '3', '4', '5', '6', '7', '8', '9'},
+//	{'y', 'y', 'y', 'y', 'y', 'y', 'y', 'y', 'y'}
+//};
+char tictacarray[9]{'1', '2', '3', '4', '5', '6', '7', '8', '9'};
+char allowed[9]{'y', 'y', 'y', 'y', 'y', 'y', 'y', 'y', 'y'};
 bool run = true; //runs the game if true
+int runtime = 0;
 char player1move;
 char player2move;
 char continuegame; //continue game (Y/N)
-int wincon = 0; //stores which victory if any has been achived
+int wincon = 0; //stores which victory if any has been 
+bool ai = false; //turn of or on ai
+char sorm; //holds the choise for singleplayer or multiplayer
+
 
 //X = player 1, O = player2
 //draw is a  thng
 
-int main()
-{
-	std::cout << "******** Welcome to Tic Tac Toe! ********";
+int main() {
+	std::cout << "******** Welcome to Tic Tac Toe! ********"; //on run title
 	std::cout << std::endl;
+	printstatus();
+
+	std::cout << "Do you want to play multiplayer or singleplayer? \n";
+	std::cout << "Type 'M' for multiplayer and 'S' for singleplayer: ";
+	std::cin >> sorm;
+	std::cout << std::endl;
+
+
+	switch (sorm) { //takes playerinput and turns ai on or off acordingly
+	case 'M':case 'm':
+		ai = false;
+			break;
+	case 'S':case 's':
+		ai = true;
+		break;
+	}
+
+	while (run == true) {
+		runtime++;
+		printstatus();
+		playerinput(); //gets player inputs
+		wincheck(); //checks if someone has won
+	}
+}
+
+void printstatus() {
+	//prints current state of the game
+	std::cout << allowed[0] << allowed[1] << allowed[2] << allowed[3] << allowed[4] << allowed[5] << allowed[6] << allowed[7] << allowed[8] << std::endl; //this is for debugging
 	std::cout << "|   " << tictacarray[0] << "   |   " << tictacarray[1] << "   |   " << tictacarray[2] << "   |" << std::endl;
 	std::cout << "|   " << tictacarray[3] << "   |   " << tictacarray[4] << "   |   " << tictacarray[5] << "   |" << std::endl;
 	std::cout << "|   " << tictacarray[6] << "   |   " << tictacarray[7] << "   |   " << tictacarray[8] << "   |" << std::endl;
 	std::cout << std::endl;
+}
 
-	while (run == true) { //prints the current state of the game and calls the functions for chaning the game
-		std::cout << "Player 1 - Write a number from 1 to 9: ";
-		std::cin >> player1move; //sets player input as char.
-		playermove(player1move, '0'); //calls playermove function with char 1-9 as input.
 
-		//prints current state of the game
-		std::cout << "|   " << tictacarray[0] << "   |   " << tictacarray[1] << "   |   " << tictacarray[2] << "   |" << std::endl;
-		std::cout << "|   " << tictacarray[3] << "   |   " << tictacarray[4] << "   |   " << tictacarray[5] << "   |" << std::endl;
-		std::cout << "|   " << tictacarray[6] << "   |   " << tictacarray[7] << "   |   " << tictacarray[8] << "   |" << std::endl;
-		wincheck(); //checks if someone has won
+void playerinput() {
 
+	if (runtime % 2 != 0) { //runs on uneven numbers of runtime
+		if (wincon == 0) {
+			std::cout << "Player 1 - Write a number from 1 to 9: ";
+			std::cin >> player1move; //sets player input as char.
+			playermove(player1move, '0'); //calls playermove function with char 1-9 as input.
+		}
+	}
+	else if (runtime % 2 == 0 && ai == false) { // runs on even numbers of runtime
 		if (wincon == 0) { //makes it so that player 2 does not get a turn after player 1 has already won
 			std::cout << "Player 2 - Write a number from 1 to 9: ";
 			std::cin >> player2move;
 			playermove('0', player2move);
-
-			//prints current state of the game
-			std::cout << "|   " << tictacarray[0] << "   |   " << tictacarray[1] << "   |   " << tictacarray[2] << "   |" << std::endl;
-			std::cout << "|   " << tictacarray[3] << "   |   " << tictacarray[4] << "   |   " << tictacarray[5] << "   |" << std::endl;
-			std::cout << "|   " << tictacarray[6] << "   |   " << tictacarray[7] << "   |   " << tictacarray[8] << "   |" << std::endl;
-			wincheck(); //checks if someone has won
 		}
 	}
-
+	//else if (runtime % 2 == 0 && ai == true) {
+	//	for (bool succes = false; succes == false;) {
+	//		std::srand(948438);
+	//		player2move= std::rand() % 57 + 49; //limits random numbers from '1' - '9'
+	//	}
+	//	playermove('0', player2move);
+	//}
 }
 
 //changes the game acording to the player inputs
 void playermove(char player1move, char player2move) {
 
-	for (int i = 0; i < sizeof(tictacarray); i++) {
-		if (tictacarray[i] == player1move) {
-			tictacarray[i] = 'X';
+	switch (ispossible(player1move, player2move)) {
+	case true:
+		if (runtime % 2 != 0){
+			tictacarray[player1move - 49] = 'X';
+			allowed[player1move - 49] = 'n';
 		}
-		else if (tictacarray[i] == player2move) {
-			tictacarray[i] = 'O';
+		else if (runtime % 2 == 0) {
+			tictacarray[player2move - 49] = 'O';
+			allowed[player2move - 49] = 'n';
 		}
+		break;
+	case false:
+		std::cout << "Invalid move! try again \n";
+		runtime - 1; //turns back the turn to the player who input the invalid move instead of moving on to the other player
+		break;
 	}
 }
 
@@ -65,7 +116,7 @@ void playermove(char player1move, char player2move) {
 //checks for a win condition
 int wincheck() {
 
-	//player 1 victory check for:
+//player 1 victory check for:
 	//example: if array pos 0, 1 and 3 are all X then player 1 victory is true.
 	if (tictacarray[0] == 'X' && tictacarray[1] == 'X' && tictacarray[2] == 'X') { //vertical row 1
 		wincon = 1;
@@ -151,16 +202,12 @@ int wincheck() {
 		switch (continuegame) {
 		case 'Y':case 'y': //if yes then reset array and wincondition and starts the game over
 			run = true;
-			wincon = 0;
-			tictacarray[0] = { '1' };
-			tictacarray[1] = { '2' };
-			tictacarray[2] = { '3' };
-			tictacarray[3] = { '4' };
-			tictacarray[4] = { '5' };
-			tictacarray[5] = { '6' };
-			tictacarray[6] = { '7' };
-			tictacarray[7] = { '8' };
-			tictacarray[8] = { '9' };
+			runtime = 0; //resets runtime
+			wincon = 0; //resets wincondition
+			//resets the array to initialized values
+			for (int i = 0; i < sizeof(tictacarray); i++) {
+				tictacarray[i] = 49 + i;
+			}
 			main();
 			break;
 		case 'N':case 'n': //if no then stops the program
@@ -169,4 +216,33 @@ int wincheck() {
 		}
 	}
 	return wincon; //0 = no win, 1 = player1win, 2 = player2win, 3 = draw
+}
+
+
+bool ispossible(char p1move, char p2move) { //not working
+
+	if (p1move > 48 || p1move < 50) { //takes only valid inputs: '1'-'9'
+		//converts the characters to integers to check the allowed array
+		switch (allowed[p1move - 48]) { //gets the possition in the array that equals the input char
+		case 'y':
+			return true;
+			break;
+		case 'n':
+			return false;
+			break;
+		}
+	}
+	else if(p2move > 48 || p2move < 50) {
+		switch (allowed[p2move - 48]) {
+		case 'y':
+			return true;
+			break;
+		case 'n':
+			return false;
+			break;
+		}
+	}
+	else {
+		return false;
+	}
 }
