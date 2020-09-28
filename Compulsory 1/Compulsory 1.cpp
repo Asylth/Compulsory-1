@@ -3,30 +3,23 @@
 #include <ctime> // for getting local time for seed value
 
 int wincheck(); //checks for victory conditoins
-void playermove(char, char); //makes the player moves happen
+void playermove(int); //makes the player moves happen
 void playerinput(); //takes player input
 void apeia(); //AI for singleplayer
 void printstatus(); //prints current state of the game
-bool ispossible(char, char); //checks wether a move is possible or not
+bool ispossible(int); //checks wether a move is possible or not 
 
-//char tictacarray[2][9]{
-//	{'1', '2', '3', '4', '5', '6', '7', '8', '9'},
-//	{'y', 'y', 'y', 'y', 'y', 'y', 'y', 'y', 'y'}
-//};
 char tictacarray[9]{'1', '2', '3', '4', '5', '6', '7', '8', '9'};
 char allowed[9]{'y', 'y', 'y', 'y', 'y', 'y', 'y', 'y', 'y'};
 bool run = true; //runs the game if true
 int runtime = 0;
-char player1move;
-char player2move;
+int playerchoise;
+//int player2move;
 char continuegame; //continue game (Y/N)
 int wincon = 0; //stores which victory if any has been 
 bool ai = false; //turn of or on ai
 char sorm; //holds the choise for singleplayer or multiplayer
 
-
-//X = player 1, O = player2
-//draw is a  thng
 
 int main() {
 	std::cout << "******** Welcome to Tic Tac Toe! ********"; //on run title
@@ -50,7 +43,7 @@ int main() {
 
 	while (run == true) {
 		runtime++;
-		printstatus();
+		printstatus(); //prints the board
 		playerinput(); //gets player inputs
 		wincheck(); //checks if someone has won
 	}
@@ -71,15 +64,15 @@ void playerinput() {
 	if (runtime % 2 != 0) { //runs on uneven numbers of runtime
 		if (wincon == 0) {
 			std::cout << "Player 1 - Write a number from 1 to 9: ";
-			std::cin >> player1move; //sets player input as char.
-			playermove(player1move, '0'); //calls playermove function with char 1-9 as input.
+			std::cin >> playerchoise; //sets player input as char.
+			playermove(playerchoise); //calls playermove function with char 1-9 as input.
 		}
 	}
 	else if (runtime % 2 == 0 && ai == false) { // runs on even numbers of runtime
 		if (wincon == 0) { //makes it so that player 2 does not get a turn after player 1 has already won
 			std::cout << "Player 2 - Write a number from 1 to 9: ";
-			std::cin >> player2move;
-			playermove('0', player2move);
+			std::cin >> playerchoise;
+			playermove(playerchoise);
 		}
 	}
 	//else if (runtime % 2 == 0 && ai == true) {
@@ -92,22 +85,22 @@ void playerinput() {
 }
 
 //changes the game acording to the player inputs
-void playermove(char player1move, char player2move) {
+void playermove(int playerchoise) {
 
-	switch (ispossible(player1move, player2move)) {
+	switch (ispossible(playerchoise)) {
 	case true:
 		if (runtime % 2 != 0){
-			tictacarray[player1move - 49] = 'X';
-			allowed[player1move - 49] = 'n';
+			tictacarray[playerchoise - 1] = 'X';
+			allowed[playerchoise - 1] = 'n';
 		}
 		else if (runtime % 2 == 0) {
-			tictacarray[player2move - 49] = 'O';
-			allowed[player2move - 49] = 'n';
+			tictacarray[playerchoise - 1] = 'O';
+			allowed[playerchoise - 1] = 'n';
 		}
 		break;
 	case false:
 		std::cout << "Invalid move! try again \n";
-		runtime - 1; //turns back the turn to the player who input the invalid move instead of moving on to the other player
+		runtime = -1; //turns back the turn to the player who input the invalid move instead of moving on to the other player. does not work for now
 		break;
 	}
 }
@@ -208,6 +201,9 @@ int wincheck() {
 			for (int i = 0; i < sizeof(tictacarray); i++) {
 				tictacarray[i] = 49 + i;
 			}
+			for (int i = 0; i < sizeof(allowed); i++) {
+				allowed[i] = 'y';
+			}
 			main();
 			break;
 		case 'N':case 'n': //if no then stops the program
@@ -219,11 +215,11 @@ int wincheck() {
 }
 
 
-bool ispossible(char p1move, char p2move) { //not working
+bool ispossible(int pmove) {
 
-	if (p1move > 48 || p1move < 50) { //takes only valid inputs: '1'-'9'
+	if (pmove > 0 || pmove < 10) { //takes only valid inputs: '1'-'9'
 		//converts the characters to integers to check the allowed array
-		switch (allowed[p1move - 48]) { //gets the possition in the array that equals the input char
+		switch (allowed[pmove - 1]) { //gets the possition in the array that equals the input char
 		case 'y':
 			return true;
 			break;
@@ -232,16 +228,16 @@ bool ispossible(char p1move, char p2move) { //not working
 			break;
 		}
 	}
-	else if(p2move > 48 || p2move < 50) {
-		switch (allowed[p2move - 48]) {
-		case 'y':
-			return true;
-			break;
-		case 'n':
-			return false;
-			break;
-		}
-	}
+	//else if(pmove > 0 || pmove < 10) {
+	//	switch (allowed[pmove - 1]) {
+	//	case 'y':
+	//		return true;
+	//		break;
+	//	case 'n':
+	//		return false;
+	//		break;
+	//	}
+	//}
 	else {
 		return false;
 	}
